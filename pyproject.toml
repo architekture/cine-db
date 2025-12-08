@@ -1,9 +1,17 @@
 [project]
-name = "django-movie-db"
+name = "cine-db"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "django>=5.2.8",
+    "django-extensions>=4.1",
+    "dotenv>=0.9.9",
+    "pyyaml>=6.0.3",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.7",
 ]

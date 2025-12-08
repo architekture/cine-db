@@ -1,3 +1,10 @@
+# Django-generate files
+db.sqlite3
+*/migrations/*.py
+
+# Environment variables
+.env
+
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -6,5 +13,11 @@ dist/
 wheels/
 *.egg-info
 
+# uv files
+.ruff_cache
+
 # Virtual environments
 .venv
+
+# Exclusions
+!*/migrations/__init__.py

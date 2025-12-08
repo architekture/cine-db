@@ -1,0 +1,69 @@
+{% block content %}
+<div class="movie">
+  <h1>{{ movie.title }}</h1>
+  <h3>
+  {% if movie.director.all|length == 1 %}
+    Directed by {% for director in movie.director.all %}{{ director }}{% endfor %}
+  {% elif movie.director.all|length == 2 %}
+    Directed by {{ movie.director.all|join:" & " }}
+  {% else %}
+    Directed by {{ movie.director.all|join:", " }}
+  {% endif %}
+  </h3>
+    <p>
+      {{ movie.year }} | {{ movie.run_time }} minutes | {{ movie.aspect_ratio }}
+    </p>
+    <table>
+{% if movie.writer.all|length > 0 %}
+      <tr>
+        <td>Written by</td>
+        <td>
+{% if movie.writer.all|length == 1 %}
+          {% for writer in movie.writer.all  %}{{ writer }}{% endfor %}
+{% else %}
+          {{ movie.writer.all|join:", " }}
+{% endif %}
+        </td>
+      </tr>
+{% endif %}
+{% if movie.dp.all|length > 0 %}
+      <tr>
+{% if movie.dp.all|length == 1 %}
+        <td>Director of Photography</td>
+        <td>{% for dp in movie.dp.all  %}{{ dp }}{% endfor %}</td>
+{% elif movie.dp.all|length > 1 %}
+        <td>Directors of Photography</td>
+        <td>{{ movie.dp.all|join:", " }}</td>
+{% endif %}
+      </tr>
+{% endif %}
+{% if movie.editor.all|length > 0 %}
+      <tr>
+        <td>Edited by</td>
+        <td>
+{% if movie.editor.all|length == 1 %}
+          {% for editor in movie.editor.all  %}{{ editor }}{% endfor %}
+{% elif movie.editor.all|length > 1 %}
+          {{ movie.editor.all|join:", " }}
+{% endif %}
+        </td>
+      </tr>
+    </table>
+    <p>
+      
+    <p>
+    </p>
+{% endif %}
+    </p>
+{% if movie.prod_designer.all|length == 1 %}
+    <p>
+      {% for pd in movie.prod_designer.all %}Production Designed by: {{ pd }}{% endfor %}
+    </p>
+{% elif movie.prod_designer.all|length > 1 %}
+    <p>
+      Production Designed by: {{ movie.prod_designer.all|join:", " }}
+    </p>
+{% endif %}
+{% if movie.composer.all|length == 1 %}{% for composer in movie.composer.all %}Music Composed by: {{ composer }}{% endfor %}{% elif movie.composer.all|length > 1 %}Music Composed by: {{ movie.composer.all|join:", " }}{% endif %}
+</div>
+{% endblock content %}
