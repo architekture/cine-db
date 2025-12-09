@@ -14,11 +14,12 @@ from movies.models import(
     Writer,
     Year,
 )
-from utils.data import add_crew, load_yaml, set_crew_field
+from utils.data import add_crew, get_crew_objects
+from utils.importer import MOVIES
 
 
 def run():
-    movies = load_yaml()
+    movies = MOVIES
 
     for mv, details in movies.items():
         # Set primary fields
@@ -70,19 +71,19 @@ def run():
         Movie.objects.get_or_create(**movie)
         try:
             movie = Movie.objects.get(slug=movie["slug"])
-            directors = set_crew_field(model_name=Director, crew_members=directors)
+            directors = get_crew_objects(model_name=Director, crew_members=directors)
             movie.director.set(directors)
             if cinematographers is not None:
-                cinematographers = set_crew_field(model_name=Cinematographer, crew_members=cinematographers)
+                cinematographers = get_crew_objects(model_name=Cinematographer, crew_members=cinematographers)
                 movie.dp.set(cinematographers)
             if composers is not None:
-                composers = set_crew_field(model_name=Composer, crew_members=composers)
+                composers = get_crew_objects(model_name=Composer, crew_members=composers)
                 movie.composer.set(composers)
             if editors is not None:
-                editors = set_crew_field(model_name=Editor, crew_members=editors)
+                editors = get_crew_objects(model_name=Editor, crew_members=editors)
                 movie.editor.set(editors)
             if prod_designers is not None:
-                prod_designers = set_crew_field(model_name=ProdDesigner, crew_members=prod_designers)
+                prod_designers = get_crew_objects(model_name=ProdDesigner, crew_members=prod_designers)
                 movie.prod_designer.set(prod_designers)
         except AttributeError:
             continue

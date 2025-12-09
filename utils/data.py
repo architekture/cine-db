@@ -1,11 +1,8 @@
 """Utilities for loading data."""
 
-import csv
-import yaml
-
 from typing import Any
 
-from utils.exceptions import NAME_EXCEPTION_DICT
+from utils.importer import MOVIES, NAME_EXCEPTION_DICT
 
 
 SUBDIR = "file_imports/"
@@ -45,17 +42,30 @@ def add_crew(model_name: object, crew_members: Any) -> list:
         return crew_list
 
 
-def load_yaml(subdir=SUBDIR) -> object:
-    """Load files from YAML."""
-    file_name = input("YAML file name: ") or "movies.yml"
-    file_path = f"{subdir}{file_name}"
+def get_crew_objects(model_name: object, crew_members: list) -> list:
+    """Retrieves crew member objects from the database.
 
-    with open(file_path) as target_file:
-        stream = target_file.read()
+    Args:
+      model_name:
+        The name of crew model class being queried in the database.
+      crew_members:
+        List of dicts containing the crew member(s) names returned by
+        the add_crew function.
 
-    data = yaml.load(stream=stream, Loader=yaml.SafeLoader)
+    Returns:
+        List of retrieved crew member objects.
+    """
+    crew_list = []
 
-    return data
+    for member in crew_members:
+        crew_member = model_name.objects.get(
+            first_name=member["first_name"],
+            middle_name=member["middle_name"],
+            last_name=member["last_name"],
+        )
+        crew_list.append(crew_member)
+
+    return crew_list
 
 
 def parse_name(full_name: str) -> dict:
@@ -64,6 +74,9 @@ def parse_name(full_name: str) -> dict:
     Args:
       full_name:
         String of the crew member's full name.
+
+    Returns:
+        The first, middle, and last names of the crew member as a dict.
     """
     name_list = full_name.split(" ")
     first_name = name_list[0]
@@ -83,18 +96,3 @@ def parse_name(full_name: str) -> dict:
     }
 
     return name
-
-
-def set_crew_field(model_name: object, crew_members: Any) -> list:
-    """#TODO"""
-    crew_list = []
-
-    for member in crew_members:
-        crew_member = model_name.objects.get(
-            first_name=member["first_name"],
-            middle_name=member["middle_name"],
-            last_name=member["last_name"],
-        )
-        crew_list.append(crew_member)
-
-    return crew_list
