@@ -13,6 +13,18 @@ class AspectRatio(models.Model):
         return f"{self.aspect_ratio}:1"
 
 
+class Barcode(models.Model):
+    """Barcode model."""
+
+    barcode = models.BigIntegerField(unique=True)
+
+    class Meta:
+        ordering = ["barcode"]
+
+    def __str__(self):
+        return str(self.barcode)
+
+
 class Cinematographer(models.Model):
     """Cinematographer model."""
 
@@ -233,6 +245,7 @@ class Movie(models.Model):
     year = models.ForeignKey(Year, on_delete=models.PROTECT, null=True, blank=True)
 
     # Release info fields
+    barcode = models.ForeignKey(Barcode, on_delete=models.PROTECT, null=True, blank=True)
     discs = models.ForeignKey(Discs, on_delete=models.PROTECT, null=True, blank=True)
     publisher = models.ForeignKey(Publisher, on_delete=models.PROTECT, null=True, blank=True)
 

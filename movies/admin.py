@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from movies.models import (
     AspectRatio,
+    Barcode,
     Cinematographer,
     Composer,
     Director,
@@ -25,11 +26,13 @@ class MovieAdmin(admin.ModelAdmin):
         "run_time",
         "publisher",
         "discs",
+        "barcode",
     )
 
 
 models = [
     AspectRatio,
+    Barcode,
     Cinematographer,
     Composer,
     Director,
