@@ -5,9 +5,6 @@ from typing import Any
 from utils.importer import MOVIES, NAME_EXCEPTION_DICT
 
 
-SUBDIR = "file_imports/"
-
-
 def add_crew(model_name: object, crew_members: Any) -> list:
     """Get or create new crew members in database.
 

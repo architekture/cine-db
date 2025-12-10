@@ -2,6 +2,7 @@
 
 from movies.models import(
     AspectRatio,
+    Barcode,
     Cinematographer,
     Composer,
     Director,
@@ -43,16 +44,19 @@ def run():
         year = int(details["data"]["year"])
 
         # Set release info fields
+        barcode = int(details["data"]["release"]["upc"])
         discs = int(details["data"]["release"]["discs"])
         publisher = details["data"]["release"]["publisher"]
 
         AspectRatio.objects.get_or_create(aspect_ratio=aspect_ratio)
+        Barcode.objects.get_or_create(barcode=barcode)
         Discs.objects.get_or_create(discs=discs)
         Publisher.objects.get_or_create(publisher=publisher)
         RunTime.objects.get_or_create(run_time=run_time)
         Year.objects.get_or_create(year=year)
 
         aspect_ratio = AspectRatio.objects.get(aspect_ratio=aspect_ratio)
+        barcode = Barcode.objects.get(barcode=barcode)
         discs = Discs.objects.get(discs=discs)
         publisher = Publisher.objects.get(publisher=publisher)
         run_time = RunTime.objects.get(run_time=run_time)
@@ -62,6 +66,7 @@ def run():
             "title": title,
             "slug": slug,
             "aspect_ratio": aspect_ratio,
+            "barcode": barcode,
             "discs": discs,
             "publisher": publisher,
             "run_time": run_time,
