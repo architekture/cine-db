@@ -8,6 +8,7 @@ class AspectRatio(models.Model):
 
     class Meta:
         ordering = ["aspect_ratio"]
+        verbose_name = "Aspect Ratio"
 
     def __str__(self):
         return f"{self.aspect_ratio}:1"
@@ -113,6 +114,18 @@ class Discs(models.Model):
         return str(self.discs)
 
 
+class Distributor(models.Model):
+    """U.S. distributor model."""
+
+    distributor = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["distributor"]
+
+    def __str__(self):
+        return self.distributor
+
+
 class Editor(models.Model):
     """Editor model."""
 
@@ -153,6 +166,7 @@ class ProdDesigner(models.Model):
             ),
         ]
         ordering = ["last_name", "first_name", "middle_name"]
+        verbose_name = "Production Designer"
 
     def __str__(self):
         if self.middle_name != "":
@@ -170,6 +184,7 @@ class RunTime(models.Model):
 
     class Meta:
         ordering = ["run_time"]
+        verbose_name = "Run Time"
 
     def __str__(self):
         return f"{self.run_time} minutes"
@@ -224,6 +239,32 @@ class Year(models.Model):
         return str(self.year)
 
 
+
+class MPAARating(models.Model):
+    """MPAA rating model."""
+
+    rating = models.CharField(max_length=5, unique=True)
+
+    class Meta:
+        ordering = ["rating"]
+        verbose_name="MPAA Rating"
+
+    def __str__(self):
+        return self.rating
+
+
+class MPAARatingsReason(models.Model):
+    """Reason given for assigned MPAA rating model."""
+    reason = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ["reason"]
+        verbose_name = "MPAA Ratings Reason"
+    
+    def __str__(self):
+        return self.reason
+
+
 class Movie(models.Model):
     """Aggregate model for movies."""
 
@@ -248,6 +289,12 @@ class Movie(models.Model):
     barcode = models.ForeignKey(Barcode, on_delete=models.PROTECT, null=True, blank=True)
     discs = models.ForeignKey(Discs, on_delete=models.PROTECT, null=True, blank=True)
     publisher = models.ForeignKey(Publisher, on_delete=models.PROTECT, null=True, blank=True)
+
+    # MPAA info fields
+    rating = models.ForeignKey(MPAARating, on_delete=models.PROTECT, null=True, blank=True)
+    mpaa_cert = models.PositiveIntegerField(verbose_name="MPAA Certificate #", unique=True, null=True, blank=True)
+    distributor = models.ForeignKey(Distributor, on_delete=models.PROTECT, null=True, blank=True)
+    rating_reason = models.ManyToManyField(MPAARatingsReason, blank=True)
 
     class Meta:
         ordering = ["slug", "year"]

@@ -7,15 +7,17 @@ from movies.models import(
     Composer,
     Director,
     Discs,
+    Distributor,
     Editor,
     Movie,
+    MPAARating,
     ProdDesigner,
     Publisher,
     RunTime,
     Writer,
     Year,
 )
-from utils.data import add_crew, get_crew_objects
+from utils.data import add_crew, add_rating_reasons, get_crew_objects, get_rating_reason
 from utils.importer import MOVIES
 
 
@@ -73,6 +75,22 @@ def run():
             "year": year,
         }
 
+        # Set MPAA info fields
+        try:
+            rating = details["data"]["mpaa"]["rating"]
+            mpaa_cert = int(details["data"]["mpaa"]["certificate"])
+            distributor = details["data"]["mpaa"]["distributor"]
+            reasons = add_rating_reasons(reasons=details["data"]["mpaa"]["reason"])
+            MPAARating.objects.get_or_create(rating=rating)
+            rating = MPAARating.objects.get(rating=rating)
+            Distributor.objects.get_or_create(distributor=distributor)
+            distributor = Distributor.objects.get(distributor=distributor)
+            movie["rating"] = rating
+            movie["mpaa_cert"] = mpaa_cert
+            movie["distributor"] = distributor
+        except KeyError:
+            pass
+
         Movie.objects.get_or_create(**movie)
         try:
             movie = Movie.objects.get(slug=movie["slug"])
@@ -90,5 +108,8 @@ def run():
             if prod_designers is not None:
                 prod_designers = get_crew_objects(model_name=ProdDesigner, crew_members=prod_designers)
                 movie.prod_designer.set(prod_designers)
+            if reasons is not None:
+                reasons = get_rating_reason(reasons=reasons)
+                movie.rating_reason.set(reasons)
         except AttributeError:
             continue

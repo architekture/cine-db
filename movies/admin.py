@@ -7,8 +7,11 @@ from movies.models import (
     Composer,
     Director,
     Discs,
+    Distributor,
     Editor,
     Movie,
+    MPAARating,
+    MPAARatingsReason,
     ProdDesigner,
     Publisher,
     RunTime,
@@ -27,6 +30,8 @@ class MovieAdmin(admin.ModelAdmin):
         "publisher",
         "discs",
         "barcode",
+        "distributor",
+        "mpaa_cert",
     )
 
 
@@ -37,7 +42,10 @@ models = [
     Composer,
     Director,
     Discs,
+    Distributor,
     Editor,
+    MPAARating,
+    MPAARatingsReason,
     ProdDesigner,
     Publisher,
     RunTime,

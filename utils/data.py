@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from movies.models import MPAARatingsReason
 from utils.importer import MOVIES, NAME_EXCEPTION_DICT
 
 
@@ -17,7 +18,7 @@ def add_crew(model_name: object, crew_members: Any) -> list:
         movies file.
 
     Returns:
-        List of crew members stored as dicts.
+        List of crew members stored as dicts or None.
     """
     if crew_members is None:
         return None
@@ -37,6 +38,33 @@ def add_crew(model_name: object, crew_members: Any) -> list:
             model_name.objects.get_or_create(**crew_member)
 
         return crew_list
+
+
+def add_rating_reasons(reasons: Any, model: object=MPAARatingsReason) -> list:
+    """Get or create MPAA ratings reasons in database.
+
+    Args:
+      reasons:
+        The reason(s) stated for the designated MPAA rating.
+      model:
+        The MPAA Ratings Reason model class.
+
+    Returns:
+        List of rating reasons or None.
+    """
+    if reasons is None:
+        return None
+    else:
+        if isinstance(reasons, str):
+            reasons = [reasons]
+
+        reason_list = []
+
+        for reason in reasons:
+            reason_list.append(reason)
+            model.objects.get_or_create(reason=reason)
+
+        return reason_list
 
 
 def get_crew_objects(model_name: object, crew_members: list) -> list:
@@ -63,6 +91,27 @@ def get_crew_objects(model_name: object, crew_members: list) -> list:
         crew_list.append(crew_member)
 
     return crew_list
+
+
+def get_rating_reason(reasons: list, model: object=MPAARatingsReason) -> list:
+    """Retrieves MPAA rating reason objects from the database.
+
+    Args:
+      reasons:
+        The list of reasons being queried in the database.
+      model:
+        The MPAA Ratings Reason model class.
+
+    Returns:
+      List of retrieved ratings reasons.
+    """
+    reason_list = []
+
+    for reason in reasons:
+        mpaa_reason = model.objects.get(reason=reason)
+        reason_list.append(mpaa_reason)
+
+    return reason_list
 
 
 def parse_name(full_name: str) -> dict:
