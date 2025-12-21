@@ -255,6 +255,7 @@ class MPAARating(models.Model):
 
 class MPAARatingsReason(models.Model):
     """Reason given for assigned MPAA rating model."""
+
     reason = models.CharField(max_length=50, unique=True)
 
     class Meta:
@@ -265,19 +266,34 @@ class MPAARatingsReason(models.Model):
         return self.reason
 
 
+class GenreTag(models.Model):
+    """Genre tags model."""
+
+    genre = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ["genre"]
+        verbose_name = "Genre Tags"
+
+    def __str__(self):
+        return self.genre.title()
+
+
 class Movie(models.Model):
     """Aggregate model for movies."""
 
     # Primary fields
     title = models.CharField(max_length=150)
     slug = models.CharField(max_length=150, unique=True)
-    director = models.ManyToManyField(Director, blank=True)
+    director = models.ManyToManyField(Director, blank=True, through="DirectorPosition")
 
     # Crew fields
-    composer = models.ManyToManyField(Composer, blank=True)
-    dp = models.ManyToManyField(Cinematographer, verbose_name="Director of Photography", blank=True)
-    editor = models.ManyToManyField(Editor, blank=True)
-    prod_designer = models.ManyToManyField(ProdDesigner, verbose_name="Production Designer", blank=True)
+    composer = models.ManyToManyField(Composer, blank=True, through="ComposerPosition")
+    dp = models.ManyToManyField(
+        Cinematographer, verbose_name="Director of Photography", blank=True, through="CinematographerPosition")
+    editor = models.ManyToManyField(Editor, blank=True, through="EditorPosition")
+    prod_designer = models.ManyToManyField(
+        ProdDesigner, verbose_name="Production Designer", blank=True, through="ProdDesignerPosition")
     writer = models.ManyToManyField(Writer, blank=True, through="WriterPosition")
 
     #Technical spec fields
@@ -296,15 +312,149 @@ class Movie(models.Model):
     distributor = models.ForeignKey(Distributor, on_delete=models.PROTECT, null=True, blank=True)
     rating_reason = models.ManyToManyField(MPAARatingsReason, blank=True)
 
+    # Genre tags
+    genre = models.ManyToManyField(GenreTag, blank=True)
+
     class Meta:
         ordering = ["slug", "year"]
 
     def __str__(self):
         return self.title
 
+    def get_directors(self):
+        """Return list of editors in sequence order."""
+        return self.directorposition_set.all().order_by("sequence")
+
+    def get_composers(self):
+        """Return list of editors in sequence order."""
+        return self.composerposition_set.all().order_by("sequence")
+
+    def get_dps(self):
+        """Return list of editors in sequence order."""
+        return self.cinematographerposition_set.all().order_by("sequence")
+
+    def get_editors(self):
+        """Return list of editors in sequence order."""
+        return self.editorposition_set.all().order_by("sequence")
+
+    def get_prod_designers(self):
+        """Return list of editors in sequence order."""
+        return self.proddesignerposition_set.all().order_by("sequence")
+
+    def get_writers(self):
+        """Return list of writers in sequence order."""
+        return self.writerposition_set.all().order_by("sequence")
+
+
+class CinematographerPosition(models.Model):
+    """Through model for adding sequence data to the junction table."""
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    dp = models.ForeignKey(Cinematographer, on_delete=models.CASCADE)
+    sequence = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["movie", "sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "dp", "sequence"],
+                name="movie_dp_seq"
+            )
+        ]
+
+    def __str__(self):
+        return str(self.dp)
+
+
+class ComposerPosition(models.Model):
+    """Through model for adding sequence data to the junction table."""
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    composer = models.ForeignKey(Composer, on_delete=models.CASCADE)
+    sequence = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["movie", "sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "composer", "sequence"],
+                name="movie_composer_seq"
+            )
+        ]
+
+    def __str__(self):
+        return str(self.composer)
+
+
+class DirectorPosition(models.Model):
+    """Through model for adding sequence data to the junction table."""
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    director = models.ForeignKey(Director, on_delete=models.CASCADE)
+    sequence = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["movie", "sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "director", "sequence"],
+                name="movie_director_seq"
+            )
+        ]
+
+    def __str__(self):
+        return str(self.director)
+
+
+class EditorPosition(models.Model):
+    """Through model for adding sequence data to the junction table."""
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
+    sequence = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["movie", "sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "editor", "sequence"],
+                name="movie_editor_seq"
+            )
+        ]
+
+    def __str__(self):
+        return str(self.editor)
+
+
+class ProdDesignerPosition(models.Model):
+    """Through model for adding sequence data to the junction table."""
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    prod_designer = models.ForeignKey(ProdDesigner, on_delete=models.CASCADE)
+    sequence = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["movie", "sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "prod_designer", "sequence"],
+                name="movie_prod_designer_seq"
+            )
+        ]
+
+    def __str__(self):
+        return str(self.prod_designer)
+
 
 class WriterPosition(models.Model):
     """Through model for adding sequence data to the junction table."""
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    crew_member = models.ForeignKey(Writer, on_delete=models.CASCADE)
-    sequence = models.IntegerField()
+    writer = models.ForeignKey(Writer, on_delete=models.CASCADE)
+    sequence = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["movie", "sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "writer", "sequence"],
+                name="movie_writer_seq"
+            )
+        ]
+
+    def __str__(self):
+        return str(self.writer)
