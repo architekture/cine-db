@@ -4,17 +4,24 @@ from movies.models import(
     AspectRatio,
     Barcode,
     Cinematographer,
+    CinematographerPosition,
     Composer,
+    ComposerPosition,
     Director,
+    DirectorPosition,
     Discs,
     Distributor,
     Editor,
+    EditorPosition,
+    GenreTag,
     Movie,
     MPAARating,
     ProdDesigner,
+    ProdDesignerPosition,
     Publisher,
     RunTime,
     Writer,
+    WriterPosition,
     Year,
 )
 from utils.data import add_crew, add_rating_reasons, get_crew_objects, get_rating_reason
@@ -91,25 +98,59 @@ def run():
         except KeyError:
             pass
 
+        # Set genre tags
+        genres = details["data"]["genres"]
+        genre_list = []
+        for genre in genres:
+            genre_list.append(genre)
+            GenreTag.objects.get_or_create(genre=genre)
+        genre_tags = []
+        for genre in genre_list:
+            genre = GenreTag.objects.get(genre=genre)
+            genre_tags.append(genre)
+
         Movie.objects.get_or_create(**movie)
         try:
             movie = Movie.objects.get(slug=movie["slug"])
+
+            seq = 0
             directors = get_crew_objects(model_name=Director, crew_members=directors)
-            movie.director.set(directors)
+            for director in directors:
+                DirectorPosition.objects.get_or_create(movie=movie, director=director, sequence=seq)
+                seq +=1
             if cinematographers is not None:
+                seq = 0
                 cinematographers = get_crew_objects(model_name=Cinematographer, crew_members=cinematographers)
-                movie.dp.set(cinematographers)
+                for dp in cinematographers:
+                    CinematographerPosition.objects.get_or_create(movie=movie, dp=dp, sequence=seq)
+                    seq += 1
             if composers is not None:
+                seq = 0
                 composers = get_crew_objects(model_name=Composer, crew_members=composers)
-                movie.composer.set(composers)
+                for composer in composers:
+                    ComposerPosition.objects.get_or_create(movie=movie, composer=composer, sequence=seq)
+                    seq += 1
             if editors is not None:
+                seq = 0
                 editors = get_crew_objects(model_name=Editor, crew_members=editors)
-                movie.editor.set(editors)
+                for editor in editors:
+                    EditorPosition.objects.get_or_create(movie=movie, editor=editor, sequence=seq)
+                    seq += 1
             if prod_designers is not None:
+                seq = 0
                 prod_designers = get_crew_objects(model_name=ProdDesigner, crew_members=prod_designers)
-                movie.prod_designer.set(prod_designers)
+                for designer in prod_designers:
+                    ProdDesignerPosition.objects.get_or_create(movie=movie, prod_designer=designer, sequence=seq)
+                    seq += 1
+            if writers is not None:
+                seq = 0
+                writers = get_crew_objects(model_name=Writer, crew_members=writers)
+                for writer in writers:
+                    WriterPosition.objects.get_or_create(movie=movie, writer=writer, sequence=seq)
+                    seq += 1
             if reasons is not None:
                 reasons = get_rating_reason(reasons=reasons)
                 movie.rating_reason.set(reasons)
+            movie.genre.set(genre_tags)
         except AttributeError:
             continue

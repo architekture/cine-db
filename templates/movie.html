@@ -2,68 +2,77 @@
 <div class="movie">
   <h1>{{ movie.title }}</h1>
   <h3>
-  {% if movie.director.all|length == 1 %}
-    Directed by {% for director in movie.director.all %}{{ director }}{% endfor %}
-  {% elif movie.director.all|length == 2 %}
-    Directed by {{ movie.director.all|join:" & " }}
-  {% else %}
-    Directed by {{ movie.director.all|join:", " }}
-  {% endif %}
+{% if movie.get_directors|length == 1 %}
+  Directed by {% for director in movie.get_directors %}{{ director }}{% endfor %}
+{% elif movie.get_directors|length == 2 %}
+  Directed by {{ movie.get_directors|join:" & " }}
+{% else %}
+  Directed by {{ movie.get_directors|join:", " }}
+{% endif %}
   </h3>
     <p>
       {{ movie.year }} | {{ movie.run_time }} | {{ movie.aspect_ratio }}
     </p>
-    <table>
-{% if movie.writer.all|length > 0 %}
-      <tr>
-        <td>Written by</td>
-        <td>
-{% if movie.writer.all|length == 1 %}
-          {% for writer in movie.writer.all  %}{{ writer }}{% endfor %}
+  <table>
+{% if movie.get_writers|length > 0 %}
+    <tr>
+      <td>Written by</td>
+      <td>
+{% if movie.get_writers|length == 1 %}
+  {% for writer in movie.get_writers  %}{{ writer }}{% endfor %}
 {% else %}
-          {{ movie.writer.all|join:", " }}
+  {{ movie.get_writers|join:", " }}
 {% endif %}
-        </td>
-      </tr>
+      </td>
+    </tr>
 {% endif %}
-{% if movie.dp.all|length > 0 %}
-      <tr>
-{% if movie.dp.all|length == 1 %}
-        <td>Director of Photography</td>
-        <td>{% for dp in movie.dp.all  %}{{ dp }}{% endfor %}</td>
-{% elif movie.dp.all|length > 1 %}
-        <td>Directors of Photography</td>
-        <td>{{ movie.dp.all|join:", " }}</td>
+{% if movie.get_dps|length > 0 %}
+    <tr>
+{% if movie.get_dps|length == 1 %}
+      <td>Director of Photography</td>
+      <td>{% for dp in movie.get_dps  %}{{ dp }}{% endfor %}</td>
+{% else %}
+      <td>Directors of Photography</td>
+      <td>{{ movie.get_dps|join:", " }}</td>
 {% endif %}
-      </tr>
+    </tr>
 {% endif %}
-{% if movie.editor.all|length > 0 %}
-      <tr>
-        <td>Edited by</td>
-        <td>
-{% if movie.editor.all|length == 1 %}
-          {% for editor in movie.editor.all  %}{{ editor }}{% endfor %}
-{% elif movie.editor.all|length > 1 %}
-          {{ movie.editor.all|join:", " }}
+{% if movie.get_editors|length > 0 %}
+    <tr>
+      <td>Edited by</td>
+      <td>
+{% if movie.get_editors|length == 1 %}
+  {% for editor in movie.get_editors %}{{ editor }}{% endfor %}
+{% else %}
+  {{ movie.get_editors|join:", " }}
 {% endif %}
-        </td>
-      </tr>
-    </table>
-    <p>
-      
-    <p>
-    </p>
+      </td>
+    </tr>
 {% endif %}
-    </p>
-{% if movie.prod_designer.all|length == 1 %}
-    <p>
-      {% for pd in movie.prod_designer.all %}Production Designed by: {{ pd }}{% endfor %}
-    </p>
-{% elif movie.prod_designer.all|length > 1 %}
-    <p>
-      Production Designed by: {{ movie.prod_designer.all|join:", " }}
-    </p>
+{% if movie.get_prod_designers|length > 0 %}
+    <tr>
+      <td>Production Designed by</td>
+      <td>
+{% if movie.get_prod_designers|length == 1 %}
+  {% for pd in movie.get_prod_designers %}{{ pd }}{% endfor %}
+{% else %}
+  {{ movie.get_prod_designers|join:", " }}
 {% endif %}
-{% if movie.composer.all|length == 1 %}{% for composer in movie.composer.all %}Music Composed by: {{ composer }}{% endfor %}{% elif movie.composer.all|length > 1 %}Music Composed by: {{ movie.composer.all|join:", " }}{% endif %}
+      </td>
+    </tr>
+{% endif %}
+{% if movie.get_composers|length > 0 %}
+    <tr>
+      <td>Music Composed by</td>
+      <td>
+{% if movie.get_composers|length == 1 %}
+  {% for composer in movie.get_composers %}{{ composer }}{% endfor %}
+{% else %}
+  {{ movie.get_composers|join:", " }}
+{% endif %}
+      </td>
+    </tr>
+{% endif %}
+  </table>
 </div>
 {% endblock content %}
